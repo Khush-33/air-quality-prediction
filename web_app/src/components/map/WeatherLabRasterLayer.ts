@@ -72,18 +72,18 @@ function colToLon(col: number): number {
     return BOUNDS.minLon + (col / (GRID_W - 1)) * (BOUNDS.maxLon - BOUNDS.minLon);
 }
 
-// ── Metric normalisation ──────────────────────────────────────────────────────
+// ── Metric normalisation (calibrated to real EPA & CPCB severity distributions) ─
 function normalise(val: number, metric: string): number {
-    if (metric === 'us_aqi') return Math.min(100, (val / 300) * 100);
-    if (metric === 'pm2_5') return Math.min(100, (val / 150) * 100);
-    if (metric === 'nitrogen_dioxide') return Math.min(100, (val / 200) * 100);
-    return Math.min(100, val); // chhi_score already 0–100
+    if (metric === 'us_aqi') return Math.min(100, (val / 250) * 100);
+    if (metric === 'pm2_5') return Math.min(100, (val / 120) * 100);
+    if (metric === 'nitrogen_dioxide') return Math.min(100, (val / 80) * 100);
+    return Math.min(100, Math.max(0, val)); // chhi_score already 0–100
 }
 
 function metricVal(n: CityNodeStatus, metric: string): number {
     if (metric === 'us_aqi') return n.us_aqi ?? 0;
     if (metric === 'pm2_5') return n.pm2_5 ?? 0;
-    if (metric === 'nitrogen_dioxide') return n.nitrogen_dioxide ?? 0;
+    if (metric === 'nitrogen_dioxide') return n.nitrogen_dioxide ?? (n as any).no2 ?? 0;
     return n.chhi_score ?? 0;
 }
 
@@ -304,8 +304,8 @@ export function updateWeatherLabImage(
     const canvas = renderWeatherLabField(nodes, metric);
     if (!canvas) return;
 
-    const url = canvas.toDataURL('image/png');
-    src.updateImage({ url, coordinates: WEATHERLAB_COORDS });
+    // Use already-decoded canvas directly for instant, synchronous WebGL texture update
+    src.updateImage({ image: canvas, coordinates: WEATHERLAB_COORDS });
 }
 
 export function setWeatherLabVisibility(map: maplibregl.Map, visible: boolean): void {

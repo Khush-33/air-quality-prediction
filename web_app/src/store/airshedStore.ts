@@ -36,7 +36,7 @@ export const useAirshedStore = create<AirshedState>((set) => ({
     selectedTimestamp: 0,
     selectedClusterFilter: null,
     selectedMetric: 'chhi_score',
-    layerVisibility: { edges: true, pulses: true, plumes: true, pins: true, cloudField: false },
+    layerVisibility: { edges: true, pulses: true, plumes: true, pins: true, cloudField: true },
     isForecastPanelOpen: true,
     isLayerPanelOpen: true,
     isDriftPanelOpen: false,

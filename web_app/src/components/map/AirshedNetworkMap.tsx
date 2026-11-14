@@ -52,7 +52,7 @@ const hexToRgba = (hex: string, a: number) => {
 const metricValue = (node: CityNodeStatus, metric: string) => {
     if (metric === 'us_aqi') return node.us_aqi ?? 0;
     if (metric === 'pm2_5') return node.pm2_5 ?? 0;
-    if (metric === 'nitrogen_dioxide') return node.nitrogen_dioxide ?? 0;
+    if (metric === 'nitrogen_dioxide') return node.nitrogen_dioxide ?? (node as any).no2 ?? 0;
     return node.chhi_score ?? 0;
 };
 
@@ -70,18 +70,24 @@ function distKm(lon1: number, lat1: number, lon2: number, lat2: number): number 
 // Helper function to return severity color based purely on the active metric value
 export function getSeverityColor(val: number, metric: string): { bg: string; border: string } {
     if (metric === 'chhi_score') {
-        if (val > 75) {
-            return { bg: 'rgba(192, 0, 0, 0.85)', border: '#c00000' };
-        } else if (val > 50) {
-            return { bg: 'rgba(230, 126, 34, 0.80)', border: '#e67e22' };
-        } else if (val > 25) {
-            return { bg: 'rgba(243, 156, 18, 0.70)', border: '#f39c12' };
-        } else {
-            return { bg: 'rgba(39, 174, 96, 0.75)', border: '#27ae60' };
-        }
+        if (val > 75) return { bg: 'rgba(192, 0, 0, 0.85)', border: '#c00000' };
+        if (val > 50) return { bg: 'rgba(230, 126, 34, 0.80)', border: '#e67e22' };
+        if (val > 25) return { bg: 'rgba(243, 156, 18, 0.70)', border: '#f39c12' };
+        return { bg: 'rgba(39, 174, 96, 0.75)', border: '#27ae60' };
     }
-
-    // Fallback for US AQI / PM2.5 / NO2
+    if (metric === 'pm2_5') {
+        if (val > 120) return { bg: 'rgba(192, 0, 0, 0.85)', border: '#c00000' };
+        if (val > 60) return { bg: 'rgba(230, 126, 34, 0.80)', border: '#e67e22' };
+        if (val > 30) return { bg: 'rgba(243, 156, 18, 0.70)', border: '#f39c12' };
+        return { bg: 'rgba(39, 174, 96, 0.75)', border: '#27ae60' };
+    }
+    if (metric === 'nitrogen_dioxide') {
+        if (val > 80) return { bg: 'rgba(192, 0, 0, 0.85)', border: '#c00000' };
+        if (val > 40) return { bg: 'rgba(230, 126, 34, 0.80)', border: '#e67e22' };
+        if (val > 20) return { bg: 'rgba(243, 156, 18, 0.70)', border: '#f39c12' };
+        return { bg: 'rgba(39, 174, 96, 0.75)', border: '#27ae60' };
+    }
+    // US AQI (0-50 Good, 51-100 Moderate, 101-150 Unhealthy, 150+ Severe)
     if (val > 150) return { bg: 'rgba(192, 0, 0, 0.85)', border: '#c00000' };
     if (val > 100) return { bg: 'rgba(230, 126, 34, 0.80)', border: '#e67e22' };
     if (val > 50) return { bg: 'rgba(243, 156, 18, 0.70)', border: '#f39c12' };
@@ -102,25 +108,30 @@ const buildLayers = (
     );
     visible.forEach(([id, n]) => coords.set(id, [n.longitude, n.latitude]));
 
-    // ── 1. Cluster Envelopes ───────────────────────────────────────────────────
-    const clusterMap = new Map<number, [number, number][]>();
+    // ── 1. Cluster Envelopes (dynamically tinted by active metric severity) ────
+    const clusterMap = new Map<number, { pts: [number, number][]; vals: number[] }>();
     for (const [, n] of visible) {
         const cid = n.cluster_id;
-        if (!clusterMap.has(cid)) clusterMap.set(cid, []);
-        clusterMap.get(cid)!.push([n.longitude, n.latitude]);
+        if (!clusterMap.has(cid)) clusterMap.set(cid, { pts: [], vals: [] });
+        clusterMap.get(cid)!.pts.push([n.longitude, n.latitude]);
+        if (n.data_available !== false) {
+            clusterMap.get(cid)!.vals.push(metricValue(n, metric));
+        }
     }
 
     const envelopes: FC = {
         type: 'FeatureCollection',
-        features: Array.from(clusterMap.entries()).map(([cid, pts]) => {
-            const ring = createClusterEnvelope(pts, 1.5);
-            const col = clusterColor(cid, payload);
+        features: Array.from(clusterMap.entries()).map(([cid, data]) => {
+            const ring = createClusterEnvelope(data.pts, 1.5);
+            const avgVal = data.vals.length ? data.vals.reduce((a, b) => a + b, 0) / data.vals.length : 0;
+            const sev = getSeverityColor(avgVal, metric);
+            const col = sev.border;
             return {
                 type: 'Feature',
                 properties: {
                     cluster_id: cid,
-                    fill: hexToRgba(col, 0.08),
-                    stroke: hexToRgba(col, 0.35),
+                    fill: hexToRgba(col, 0.12),
+                    stroke: hexToRgba(col, 0.40),
                     color: col,
                     active: clusterFilter === cid ? 1 : 0,
                 },
@@ -291,16 +302,16 @@ export default function AirshedNetworkMap() {
             instance.addLayer({
                 id: 'envelope-fill', type: 'fill', source: 'envelopes',
                 paint: {
-                    'fill-color': ['get', 'fill'],
-                    'fill-opacity': 0.08,
+                    'fill-color': ['get', 'color'],
+                    'fill-opacity': 0.16,
                 },
             });
             instance.addLayer({
                 id: 'envelope-glow', type: 'line', source: 'envelopes',
                 paint: {
-                    'line-color': ['get', 'stroke'],
-                    'line-width': 1.5,
-                    'line-opacity': 0.25,
+                    'line-color': ['get', 'color'],
+                    'line-width': 2,
+                    'line-opacity': 0.50,
                 },
             });
 
@@ -486,8 +497,8 @@ export default function AirshedNetworkMap() {
         const currentStep = payload.time_steps[selectedSubStep];
         if (!currentStep) return;
 
-        // Only update the WeatherLab raster when cloud field is visible and style is loaded
-        if (layerVisibility.cloudField && map.current.isStyleLoaded()) {
+        // Only update the WeatherLab raster when cloud field is visible
+        if (layerVisibility.cloudField) {
             updateWeatherLabImage(map.current, currentStep.nodes, selectedMetric);
         }
     }, [selectedSubStep, selectedMetric, payload, layerVisibility.cloudField]);
