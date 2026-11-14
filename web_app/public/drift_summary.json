@@ -1,8 +1,8 @@
 {
-  "updated_at": "2026-11-14T05:17:24.036442+05:30",
-  "latest_mae": 9.96,
-  "latest_rmse": 16.1,
-  "latest_bias": -4.0,
+  "updated_at": "2026-11-15T04:10:27.639522+05:30",
+  "latest_mae": 11.98,
+  "latest_rmse": 19.45,
+  "latest_bias": -4.62,
   "history_30d": [
     {
       "date": "2026-11-02",
@@ -326,95 +326,127 @@
         "MAA": 3.86,
         "JAI": 7.22
       }
+    },
+    {
+      "date": "2026-11-15",
+      "timestamp": "2026-11-15T04:10:26.931918+05:30",
+      "overall_mae": 11.98,
+      "overall_rmse": 19.45,
+      "overall_bias": -4.62,
+      "psi": {
+        "source_pm25_t": 0.721
+      },
+      "city_mae": {
+        "DEL": 14.57,
+        "AGR": 23.33,
+        "KNP": 19.43,
+        "LKO": 35.66,
+        "VAR": 23.2,
+        "PAT": 20.91,
+        "KOL": 22.12,
+        "PUN": 5.4,
+        "NSK": 5.26,
+        "CSN": 5.23,
+        "NAG": 9.52,
+        "BHO": 5.46,
+        "IND": 5.78,
+        "AHM": 5.31,
+        "BOM": 8.11,
+        "SUR": 9.26,
+        "HYD": 5.31,
+        "BLR": 6.18,
+        "MAA": 2.86,
+        "JAI": 8.83
+      }
     }
   ],
   "psi_metrics": {
-    "source_pm25_t": 0.8089
+    "source_pm25_t": 0.721
   },
   "city_performance": {
     "DEL": {
-      "avg_mae": 26.65,
-      "current_bias": -0.88
+      "avg_mae": 25.55,
+      "current_bias": -2.9
     },
     "AGR": {
-      "avg_mae": 36.55,
-      "current_bias": -0.41
+      "avg_mae": 35.35,
+      "current_bias": -4.14
     },
     "KNP": {
-      "avg_mae": 34.19,
-      "current_bias": -8.21
+      "avg_mae": 32.55,
+      "current_bias": -8.53
     },
     "LKO": {
-      "avg_mae": 28.99,
-      "current_bias": -9.77
+      "avg_mae": 29.59,
+      "current_bias": -10.07
     },
     "VAR": {
-      "avg_mae": 24.16,
-      "current_bias": -6.9
+      "avg_mae": 24.07,
+      "current_bias": -10.16
     },
     "PAT": {
-      "avg_mae": 21.03,
-      "current_bias": -1.02
+      "avg_mae": 21.02,
+      "current_bias": -2.72
     },
     "KOL": {
-      "avg_mae": 19.75,
-      "current_bias": 5.35
+      "avg_mae": 19.99,
+      "current_bias": 6.52
     },
     "PUN": {
-      "avg_mae": 9.61,
-      "current_bias": -0.66
+      "avg_mae": 9.23,
+      "current_bias": -1.2
     },
     "NSK": {
-      "avg_mae": 5.94,
-      "current_bias": 0.01
+      "avg_mae": 5.88,
+      "current_bias": 0.46
     },
     "CSN": {
-      "avg_mae": 6.29,
-      "current_bias": -0.79
+      "avg_mae": 6.19,
+      "current_bias": -1.42
     },
     "NAG": {
-      "avg_mae": 11.76,
-      "current_bias": -1.69
-    },
-    "BHO": {
-      "avg_mae": 7.51,
-      "current_bias": -2.1
-    },
-    "IND": {
-      "avg_mae": 7.34,
-      "current_bias": -0.68
-    },
-    "AHM": {
-      "avg_mae": 4.49,
-      "current_bias": -0.37
-    },
-    "BOM": {
-      "avg_mae": 8.07,
-      "current_bias": -0.87
-    },
-    "SUR": {
-      "avg_mae": 9.63,
-      "current_bias": -4.64
-    },
-    "HYD": {
-      "avg_mae": 3.65,
-      "current_bias": 0.11
-    },
-    "BLR": {
-      "avg_mae": 6.1,
-      "current_bias": -0.77
-    },
-    "MAA": {
-      "avg_mae": 4.03,
+      "avg_mae": 11.56,
       "current_bias": -1.11
     },
+    "BHO": {
+      "avg_mae": 7.32,
+      "current_bias": -1.77
+    },
+    "IND": {
+      "avg_mae": 7.2,
+      "current_bias": -1.27
+    },
+    "AHM": {
+      "avg_mae": 4.56,
+      "current_bias": -1.06
+    },
+    "BOM": {
+      "avg_mae": 8.08,
+      "current_bias": -2.55
+    },
+    "SUR": {
+      "avg_mae": 9.57,
+      "current_bias": -1.69
+    },
+    "HYD": {
+      "avg_mae": 3.8,
+      "current_bias": 0.13
+    },
+    "BLR": {
+      "avg_mae": 6.11,
+      "current_bias": -1.53
+    },
+    "MAA": {
+      "avg_mae": 3.92,
+      "current_bias": -0.52
+    },
     "JAI": {
-      "avg_mae": 9.3,
-      "current_bias": 0.82
+      "avg_mae": 9.26,
+      "current_bias": 0.45
     }
   },
   "calibration_status": {
-    "updated_at": "2026-11-14T05:17:24.014044+05:30",
+    "updated_at": "2026-11-15T04:10:27.621221+05:30",
     "alpha": 0.15,
     "max_clamp": 25.0
   }
