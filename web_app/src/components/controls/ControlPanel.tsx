@@ -4,7 +4,7 @@ import { CLUSTER_FILTERS, CLUSTER_DISPLAY } from '../../lib/cityMeta';
 
 const METRICS: { key: AirshedMetric; label: string; sub: string }[] = [
     { key: 'chhi_score', label: 'CHHI Hazard (AI)', sub: 'Compound health index' },
-    { key: 'us_aqi', label: 'US AQI', sub: 'Air quality index' },
+    { key: 'us_aqi', label: 'AQI', sub: 'Air quality index' },
     { key: 'pm2_5', label: 'PM 2.5', sub: 'Fine particulates' },
     { key: 'nitrogen_dioxide', label: 'NO₂', sub: 'Vehicle emissions' },
 ];

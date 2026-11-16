@@ -600,12 +600,12 @@ export default function ForecastPanel({ payload, onClose }: Props) {
               </div>
             </section>
 
-            {/* ══ US AQI ════════════════════════════════════════════════════ */}
+            {/* ══ AQI ════════════════════════════════════════════════════ */}
             <section className="mt-5">
               <div style={S.rowGrid} className="items-center">
                 <div className="pr-2">
                   <div className="flex h-[36px] flex-col items-start justify-center rounded-[7px] bg-[#1769d1] px-2">
-                    <span className="text-[13px] font-medium text-white leading-none">US AQI</span>
+                    <span className="text-[13px] font-medium text-white leading-none">AQI</span>
                     <span className="text-[10px] text-white/50 leading-none mt-0.5">index</span>
                   </div>
                 </div>
@@ -718,7 +718,7 @@ export default function ForecastPanel({ payload, onClose }: Props) {
               </div>
               <div className="grid grid-cols-4 overflow-hidden rounded-[9px] border border-[#282828] bg-[#010101]">
                 <div className="border-r border-[#282828] px-3 py-3 text-center">
-                  <div className="text-[10px] uppercase tracking-wider text-white/50">US AQI</div>
+                  <div className="text-[10px] uppercase tracking-wider text-white/50">AQI</div>
                   <div className="mt-1 text-[18px] font-semibold text-white">{Math.round(activeSlot?.us_aqi ?? 0)}</div>
                 </div>
                 <div className="border-r border-[#282828] px-3 py-3 text-center">

@@ -87,7 +87,7 @@ export function getSeverityColor(val: number, metric: string): { bg: string; bor
         if (val > 20) return { bg: 'rgba(243, 156, 18, 0.70)', border: '#f39c12' };
         return { bg: 'rgba(39, 174, 96, 0.75)', border: '#27ae60' };
     }
-    // US AQI (0-50 Good, 51-100 Moderate, 101-150 Unhealthy, 150+ Severe)
+    // AQI (0-50 Good, 51-100 Moderate, 101-150 Unhealthy, 150+ Severe)
     if (val > 150) return { bg: 'rgba(192, 0, 0, 0.85)', border: '#c00000' };
     if (val > 100) return { bg: 'rgba(230, 126, 34, 0.80)', border: '#e67e22' };
     if (val > 50) return { bg: 'rgba(243, 156, 18, 0.70)', border: '#f39c12' };

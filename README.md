@@ -63,7 +63,7 @@ React 19 + Vite + MapLibre GL + Zustand + ECharts + TanStack Query.
   drift metrics, per-city performance ranking, and live calibration-layer
   status, fed by `drift_summary.json`.
 - **Layer & metric controls** — toggle any map layer; switch the colour metric
-  between CHHI, US AQI, PM2.5 and NO2.
+  between CHHI, AQI, PM2.5 and NO2.
 - **Staleness guard** — the UI flags data older than the payload's declared
   freshness window (`staleness_max_hours`).
 
