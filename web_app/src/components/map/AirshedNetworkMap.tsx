@@ -15,7 +15,7 @@ import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useAirshedStore } from '../../store/airshedStore';
 import type { AirshedNetworkPayload, AirshedTimeStep, CityNodeStatus } from '../../types/airshed';
-import { clusterColor } from '../../lib/airshedSelectors';
+import { cityLabel, clusterColor, formatEta } from '../../lib/airshedSelectors';
 import { createBezierStreamline, createClusterEnvelope } from '../../utils/geoSplines';
 import WindParticleCanvas from './WindParticleCanvas';
 import {
@@ -234,7 +234,7 @@ const buildLayers = (
     const pulses: FC = {
         type: 'FeatureCollection',
         features: step.active_cascade_pulses
-            .filter((p) => coords.has(p.source_node) && coords.has(p.target_node))
+        .filter((p) => p.confidence_pct > 0 && coords.has(p.source_node) && coords.has(p.target_node))
             .map((p) => ({
                 type: 'Feature',
                 properties: { id: p.pulse_id, confidence: p.confidence_pct },
@@ -261,7 +261,6 @@ export default function AirshedNetworkMap() {
 
     const payload = useAirshedStore((s) => s.payload);
     const selectedSubStep = useAirshedStore((s) => s.selectedSubStep);
-    const selectedCityId = useAirshedStore((s) => s.selectedCityId);
     const selectedClusterFilter = useAirshedStore((s) => s.selectedClusterFilter);
     const selectedMetric = useAirshedStore((s) => s.selectedMetric);
     const layerVisibility = useAirshedStore((s) => s.layerVisibility);
@@ -529,31 +528,88 @@ export default function AirshedNetworkMap() {
         vis('pin-labels', layerVisibility.pins);
     }, [layerVisibility, step, selectedMetric]);
 
-    // ── Selected city marker ──────────────────────────────────────────────────
+    // ── Incoming cascade warning markers ──────────────────────────────────────
     useEffect(() => {
         markers.current.forEach((m) => m.remove());
         markers.current = [];
         const instance = map.current;
-        if (!instance || !step) return;
-        const node = step.nodes[selectedCityId];
-        if (!node) return;
+        if (!instance || !step || !payload) return;
 
-        const val = Math.round(metricValue(node, selectedMetric));
-        const sev = getSeverityColor(val, selectedMetric);
+        const incomingByTarget = new Map<string, typeof step.active_cascade_pulses>();
+        step.active_cascade_pulses.forEach((pulse) => {
+            if (pulse.confidence_pct <= 0) return;
+            const incoming = incomingByTarget.get(pulse.target_node) ?? [];
+            incoming.push(pulse);
+            incomingByTarget.set(pulse.target_node, incoming);
+        });
 
-        const el = document.createElement('div');
-        el.style.cssText = `
-      width: 18px; height: 18px; border-radius: 999px;
-      border: 2px solid ${sev.border};
-      background: transparent;
-      pointer-events: none;
-    `;
-        markers.current = [
-            new maplibregl.Marker({ element: el, anchor: 'center' })
-                .setLngLat([node.longitude, node.latitude])
-                .addTo(instance),
-        ];
-    }, [selectedCityId, step, selectedMetric]);
+        incomingByTarget.forEach((incoming, targetId) => {
+            const targetNode = step.nodes[targetId];
+            if (!targetNode) return;
+
+            const el = document.createElement('button');
+            el.type = 'button';
+            el.className = 'cascade-warning-marker';
+            el.setAttribute(
+                'aria-label',
+                `Incoming cascade warning for ${targetNode.city_name}. Click for source and arrival time.`,
+            );
+            el.innerHTML = `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2.5 22 20H2L12 2.5Z" fill="#f97316" stroke="#fff7ed" stroke-width="1.5"/>
+                    <path d="M12 7.5v7" fill="none" stroke="#171717" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="17.8" r="1.1" fill="#171717"/>
+                </svg>
+            `;
+
+            const marker = new maplibregl.Marker({
+                element: el,
+                anchor: 'bottom',
+                offset: [0, -10],
+            }).setLngLat([targetNode.longitude, targetNode.latitude]);
+
+            el.addEventListener('click', (event) => {
+                event.stopPropagation();
+                setCityId(targetId);
+
+                const popup = new maplibregl.Popup({
+                    closeButton: true,
+                    closeOnClick: false,
+                    offset: 16,
+                    className: 'cascade-warning-popup',
+                    maxWidth: '280px',
+                }).setLngLat([targetNode.longitude, targetNode.latitude]);
+
+                const popupEl = document.createElement('div');
+                popupEl.className = 'cascade-popup-content';
+
+                const title = document.createElement('strong');
+                title.textContent = `Incoming cascade: ${targetNode.city_name}`;
+                popupEl.appendChild(title);
+
+                incoming.forEach((pulse) => {
+                    const sourceNode = step.nodes[pulse.source_node];
+                    const row = document.createElement('div');
+                    row.className = 'cascade-popup-row';
+
+                    const source = document.createElement('span');
+                    source.textContent = `From ${cityLabel(pulse.source_node, sourceNode)}`;
+                    const time = document.createElement('span');
+                    time.textContent = `Arrival ${formatEta(pulse.estimated_arrival_ist)}`;
+                    const confidence = document.createElement('span');
+                    confidence.textContent = `${pulse.confidence_pct.toFixed(1)}% confidence`;
+
+                    row.append(source, time, confidence);
+                    popupEl.appendChild(row);
+                });
+
+                popup.setDOMContent(popupEl).addTo(instance);
+            });
+
+            marker.addTo(instance);
+            markers.current.push(marker);
+        });
+    }, [payload, step, setCityId]);
 
     return (
         <div className="absolute inset-0 w-full h-full" style={{ position: 'relative' }}>

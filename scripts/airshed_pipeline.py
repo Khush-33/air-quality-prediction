@@ -575,15 +575,17 @@ def evaluate_cascade_triggers(cities_data, cities_metadata, causal_graph, timest
                 else:
                     severity_delta_pm25 = src_pm25 * 0.3
 
-                step_data["active_cascade_pulses"].append({
-                    "pulse_id":               f"{source}_{target}_{step_idx}",
-                    "source_node":            source,
-                    "target_node":            target,
-                    "progress_ratio":         round(progress_ratio, 2),
-                    "estimated_arrival_ist":  arrival_ist,
-                    "confidence_pct":         round(confidence_pct, 1),
-                    "severity_delta_pm25":    round(severity_delta_pm25, 1)
-                })
+                confidence_pct = round(confidence_pct, 1)
+                if confidence_pct > 0:
+                    step_data["active_cascade_pulses"].append({
+                        "pulse_id":               f"{source}_{target}_{step_idx}",
+                        "source_node":            source,
+                        "target_node":            target,
+                        "progress_ratio":         round(progress_ratio, 2),
+                        "estimated_arrival_ist":  arrival_ist,
+                        "confidence_pct":         confidence_pct,
+                        "severity_delta_pm25":    round(severity_delta_pm25, 1)
+                    })
 
         time_steps_data.append(step_data)
 

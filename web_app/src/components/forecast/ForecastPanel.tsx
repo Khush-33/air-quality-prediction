@@ -308,7 +308,7 @@ export default function ForecastPanel({ payload, onClose }: Props) {
   const activeNode = payload.time_steps[selectedSubStep]?.nodes[selectedCityId];
   const meta = CITY_META[selectedCityId];
   const incoming = (payload.time_steps[selectedSubStep]?.active_cascade_pulses ?? []).filter(
-    (p) => p.target_node === selectedCityId,
+    (p) => p.target_node === selectedCityId && p.confidence_pct > 0,
   );
   const originName = incoming[0] ? cityLabel(incoming[0].source_node, payload.time_steps[selectedSubStep]?.nodes[incoming[0].source_node]) : '';
 

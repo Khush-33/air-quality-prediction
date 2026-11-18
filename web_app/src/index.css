@@ -29,3 +29,69 @@ body {
   width: 0;
   height: 0;
 }
+
+.cascade-warning-marker {
+  width: 30px;
+  height: 30px;
+  padding: 3px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(23, 23, 23, 0.92);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+
+.cascade-warning-marker svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 2px 4px rgba(249, 115, 22, 0.35));
+}
+
+.cascade-warning-marker:focus-visible {
+  outline: 3px solid #38bdf8;
+  outline-offset: 3px;
+}
+
+.cascade-warning-popup .maplibregl-popup-content {
+  padding: 12px 14px;
+  border: 1px solid rgba(249, 115, 22, 0.55);
+  border-radius: 8px;
+  background: #171717;
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7);
+}
+
+.cascade-warning-popup .maplibregl-popup-tip {
+  border-top-color: #171717;
+}
+
+.cascade-warning-popup .maplibregl-popup-close-button {
+  color: #d4d4d4;
+  font-size: 18px;
+  line-height: 18px;
+}
+
+.cascade-popup-content {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.cascade-popup-content strong {
+  color: #f97316;
+  font-size: 13px;
+}
+
+.cascade-popup-row {
+  display: grid;
+  gap: 3px;
+  padding-top: 7px;
+  border-top: 1px solid #333;
+  line-height: 1.35;
+}
+
+.cascade-popup-row span:last-child {
+  color: #a3a3a3;
+  font-size: 11px;
+}

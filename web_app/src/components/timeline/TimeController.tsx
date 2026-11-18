@@ -48,7 +48,7 @@ export default function TimeController({ forecastOpen = false, layerOpen = false
   const isObserved = step?.is_observed ?? selectedSubStep < 24;
   const node = step?.nodes[selectedCityId];
   const isAvailable = node?.data_available ?? (node?.pm2_5 !== null && node?.pm2_5 !== undefined);
-  const cascadeCount = step?.active_cascade_pulses.length ?? 0;
+  const cascadeCount = step?.active_cascade_pulses.filter((pulse) => pulse.confidence_pct > 0).length ?? 0;
   const chhi = isAvailable ? (node?.chhi_score ?? null) : null;
   const hazard = getHazardStyle(chhi);
 
